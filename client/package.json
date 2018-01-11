@@ -1,0 +1,37 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "apollo-cache-redux": "^0.1.0-alpha.7",
+    "apollo-client-preset": "^1.0.5",
+    "apollo-link-ws": "^1.0.4",
+    "apollo-utilities": "^1.0.3",
+    "firebase": "^4.8.1",
+    "graphql": "^0.12.3",
+    "graphql-tag": "^2.6.1",
+    "material-ui": "^1.0.0-beta.25",
+    "material-ui-icons": "^1.0.0-beta.17",
+    "material-ui-pickers": "^1.0.0-beta.12",
+    "moment": "^2.20.1",
+    "randomcolor": "^0.5.3",
+    "react": "^16.2.0",
+    "react-apollo": "^2.0.4",
+    "react-dates": "^16.0.1",
+    "react-dom": "^16.2.0",
+    "react-flip-move": "^2.10.0",
+    "react-redux": "^5.0.6",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
+    "react-scripts": "1.0.17",
+    "react-swipeable-views": "^0.12.12",
+    "redux": "^3.7.2",
+    "redux-logger": "^3.0.6"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
