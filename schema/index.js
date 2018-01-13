@@ -95,6 +95,7 @@ const schema = `
         allTransactions: [Transaction!]
         getUser(id: ID!): User
         getAuction(id: ID!): Auction
+        getAuctionsByCategory(category: [categor!]!): [Auction!]
         currentUser: User
         getBids(auctionId: ID!): [Bid!]
     }
