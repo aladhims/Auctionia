@@ -68,125 +68,98 @@ class Header extends React.Component {
     console.log(this.props);
     return (
       <div className={classes.root}>
-        <div className={classes.appFrame}>
-          <AppBar
-            position="fixed"
-            className={classNames(
-              classes.appBar,
-              this.state.open && classes.appBarShift
-            )}
-          >
-            <Toolbar disableGutters={!this.state.open}>
-              <IconButton
-                color="contrast"
-                aria-label="open drawer"
-                onClick={this.handleDrawerOpen}
-                className={classNames(
-                  classes.menuButton,
-                  this.state.open && classes.hide
-                )}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Typography type="title" color="inherit" noWrap>
-                Auctionia
-              </Typography>
-              <div className={classes.flexGrow} />
-            </Toolbar>
-          </AppBar>
-          <Drawer
-            type="permanent"
-            classes={{
-              paper: classNames(
-                classes.drawerPaper,
-                !this.state.open && classes.drawerPaperClose
-              )
-            }}
-            open={this.state.open}
-          >
-            <div
-              className={classes.drawerInner}
+        <AppBar position="fixed" style={{zIndex: 5}}>
+          <Toolbar>
+            <IconButton
+              onClick={() => this.setState({ open: true })}
+              className={classes.menuButton}
+              color="contrast"
+              aria-label="Menu"
             >
-              <div className={classes.drawerHeader}>
-                <IconButton onClick={this.handleDrawerClose}>
-                  {theme.direction === "rtl" ? (
-                    <ChevronRightIcon />
-                  ) : (
-                    <ChevronLeftIcon />
-                  )}
-                </IconButton>
+              <MenuIcon />
+            </IconButton>
+            <Typography type="title" color="inherit" className={classes.flex}>
+              Auctionia
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          anchor="bottom"
+          onClose={() => this.setState({ open: false })}
+          open={this.state.open}
+        >
+          <div
+            style={{ width: "auto" }}
+            tabIndex={0}
+            role="button"
+            onClick={() => this.setState({ open: false })}
+            onKeyDown={() => this.setState({ open: false })}
+          >
+            <List>
+              <div>
+                <Link to="/app">
+                  <ListItem button>
+                    <ListItemIcon>
+                      <Home />
+                    </ListItemIcon>
+                    <ListItemText primary="Beranda" />
+                  </ListItem>
+                </Link>
+                <ListItem button>
+                  <ListItemIcon>
+                    <Person />
+                  </ListItemIcon>
+                  <ListItemText primary="Profil" />
+                </ListItem>
+                <Link to="/app/myauction">
+                  <ListItem button>
+                    <ListItemIcon>
+                      <Gavel />
+                    </ListItemIcon>
+                    <ListItemText primary="Lelang" />
+                  </ListItem>
+                </Link>
+                <ListItem button>
+                  <ListItemIcon>
+                    <AttachMoney />
+                  </ListItemIcon>
+                  <ListItemText primary="Rp. 150.000.000" />
+                </ListItem>
+                <ListItem button>
+                  <ListItemIcon>
+                    <VerticalAlignBottom />
+                  </ListItemIcon>
+                  <ListItemText primary="Top Up" />
+                </ListItem>
               </div>
-              <Divider />
-              <List>
-                <div>
-                  <Link to="/app">
-                    <ListItem button>
-                      <ListItemIcon>
-                        <Home />
-                      </ListItemIcon>
-                      <ListItemText primary="Beranda" />
-                    </ListItem>
-                  </Link>
-                  <ListItem button>
-                    <ListItemIcon>
-                      <Person />
-                    </ListItemIcon>
-                    <ListItemText primary="Profil" />
-                  </ListItem>
-                  <Link to="/app/myauction">
-                    <ListItem button>
-                      <ListItemIcon>
-                        <Gavel />
-                      </ListItemIcon>
-                      <ListItemText primary="Lelang" />
-                    </ListItem>
-                  </Link>
-                  <ListItem button>
-                    <ListItemIcon>
-                      <AttachMoney />
-                    </ListItemIcon>
-                    <ListItemText primary="Rp. 150.000.000" />
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemIcon>
-                      <VerticalAlignBottom />
-                    </ListItemIcon>
-                    <ListItemText primary="Top Up" />
-                  </ListItem>
-                </div>
-              </List>
-              <Divider />
-              <List>
-                <div>
-                  <ListItem button onClick={this.handleLogout}>
-                    <ListItemIcon>
-                      <Close />
-                    </ListItemIcon>
-                    <ListItemText primary="Keluar" />
-                  </ListItem>
-                </div>
-              </List>
-            </div>
-          </Drawer>
-          <main className={classes.content}>
-            <Route
-              exact
-              path={`${match.url}/myauction`}
-              component={MyAuction}
-            />
-            <Route exact path={match.url} component={AuctionList} />
-            <Route
-              exact
-              path={`${match.url}/auction/:id`}
-              component={BiddingRoom}
-            />
-            <Route
-              exact
-              path={`${match.url}/myauction/create`}
-              component={CreateAuction}
-            />
-          </main>
-        </div>
+            </List>
+            <Divider />
+            <List>
+              <div>
+                <ListItem button onClick={this.handleLogout}>
+                  <ListItemIcon>
+                    <Close />
+                  </ListItemIcon>
+                  <ListItemText primary="Keluar" />
+                </ListItem>
+              </div>
+            </List>
+          </div>
+        </Drawer>
+        <main className={classes.content}>
+          <Route exact path={`${match.url}/myauction`} component={MyAuction} />
+          <Route exact path={match.url} component={AuctionList} />
+          <Route
+            exact
+            path={`${match.url}/auction/:id`}
+            component={BiddingRoom}
+          />
+          <Route
+            exact
+            path={`${match.url}/myauction/create`}
+            component={CreateAuction}
+          />
+        </main>
       </div>
     );
   }

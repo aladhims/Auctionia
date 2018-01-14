@@ -59,7 +59,7 @@ query getAuctionsDetail($id: ID!) {
         title
         description
         currentprice
-        photo
+        photos
         start
         end
         status
@@ -111,7 +111,7 @@ export const MY_AUCTIONS = gql`
               id
               title
               start
-              photo
+              photos
               status
             }
             
@@ -119,7 +119,7 @@ export const MY_AUCTIONS = gql`
               id
               title
               start
-              photo
+              photos
               status
             }
           }
@@ -133,27 +133,7 @@ export const ALL_AUCTIONS_QUERY = gql`
       title
       description
       currentprice
-      photo
-      start
-      category
-      end
-      status
-      by {
-        name
-        photo
-      }
-    }
-  }
-`;
-
-export const AUCTIONS_BY_CATEGORY = gql`
-  query AuctionsCategory($categories: [categor!]!) {
-    getAuctionsByCategory(category: $categories) {
-      id
-      title
-      description
-      currentprice
-      photo
+      photos
       start
       category
       end
@@ -167,13 +147,13 @@ export const AUCTIONS_BY_CATEGORY = gql`
 `;
 
 export const CREATE_AUCTION = gql`
-    mutation buatLelang($title: String!, $description: String!, $category: categor!, $initialprice: Int!, $startTime: Date!,$endTime: Date, $photo: String!) {
-        createAuction(title: $title, description: $description, category: $category, initialprice: $initialprice, start: $startTime, end: $endTime, photo: $photo ) {
+    mutation buatLelang($title: String!, $description: String!, $category: categor!, $initialprice: Int!, $startTime: Date!,$endTime: Date, $photos: [String!]) {
+        createAuction(title: $title, description: $description, category: $category, initialprice: $initialprice, start: $startTime, end: $endTime, photos: $photos ) {
             id
             title
             description
             currentprice
-            photo
+            photos
             start
             category
             end
@@ -186,14 +166,14 @@ export const CREATE_AUCTION = gql`
     }
 `;
 
-export const AUCTIONS_BY_TEXT = gql`
-    query AuctionsText($search: String!) {
-      getAuctionsByText(text: $search){
+export const AUCTIONS_BY_FILTER = gql`
+    query AuctionsFilter($search: String, $categories: [categor!]) {
+      getAuctionsByFilter(text: $search, category: $categories){
         id
         title
         description
         currentprice
-        photo
+        photos
         start
         category
         end
@@ -204,5 +184,5 @@ export const AUCTIONS_BY_TEXT = gql`
         }
       }
     }
-`
+`;
 

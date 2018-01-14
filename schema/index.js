@@ -37,10 +37,11 @@ const schema = `
         id: ID!
         title: String!
         description: String!
-        photo: String!
+        photos: [String!]!
         initialprice: Int!
         currentprice: Int!
         category: categor
+        posted: Date!
         start: Date!
         end: Date!
         by: User
@@ -96,8 +97,7 @@ const schema = `
         allTransactions: [Transaction!]
         getUser(id: ID!): User
         getAuction(id: ID!): Auction
-        getAuctionsByCategory(category: [categor!]!): [Auction!]
-        getAuctionsByText(text: String!): [Auction!]
+        getAuctionsByFilter(text: String, category: [categor!]): [Auction!]
         currentUser: User
         getBids(auctionId: ID!): [Bid!]
     }
@@ -105,7 +105,7 @@ const schema = `
     type Mutation {
         createUser(name: String!, auth: AUTH!, phone: String, photo: String): AuthPayload!
         authenticateUser(username: String!, password: String!): AuthPayload!
-        createAuction(title: String!, description: String!, category: categor!,initialprice: Int!, start: Date, end: Date, photo: String): Auction!
+        createAuction(title: String!, description: String!, category: categor!,initialprice: Int!, start: Date, end: Date, photos: [String!]): Auction!
         putBid(auctionId: ID!, amount: Int!): Bid
         updateBid(id: ID!, amount: Int!): Bid
         deleteBid(id: ID!): Boolean!

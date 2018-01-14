@@ -18,9 +18,11 @@ import Button from "material-ui/Button";
 import Icon from "material-ui/Icon";
 import * as acts from "../actions/index";
 import { connect } from "react-redux";
-import { ALL_AUCTIONS_QUERY, AUCTIONS_BY_CATEGORY, AUCTIONS_BY_TEXT } from "../queries";
+import { ALL_AUCTIONS_QUERY, AUCTIONS_BY_FILTER } from "../queries";
 import Chip from "material-ui/Chip";
 import Sticky from "react-stickynode";
+import { FormControlLabel, FormGroup } from 'material-ui/Form';
+import Switch from 'material-ui/Switch';
 
 const styles = theme => ({
   root: {
@@ -70,12 +72,27 @@ class AuctionList extends React.Component {
     this.state = {
       kategori: [],
       search: "",
+      berlangsung: false,
     };
 
     this.handleCategoryChange = this.handleCategoryChange.bind(this);
-    this.handleDeleteFilter = this.handleDeleteFilter.bind(this);
     this.handleResetFilter = this.handleResetFilter.bind(this);
-    this.handleSearch = this.handleSearch.bind(this);
+    this.handleSearchChange = this.handleSearchChange.bind(this);
+  }
+
+  async loadAuctionsWithFilter(search,categories) {
+    this.props.showLoading();
+    const filteredData = await this.props.client.query({
+      query: AUCTIONS_BY_FILTER,
+      variables: {  search,categories }
+    });
+    this.props.client.writeQuery({
+      query: ALL_AUCTIONS_QUERY,
+      data: {
+        allAuctions: filteredData.data.getAuctionsByFilter
+      }
+    })
+    this.props.hideLoading();
   }
 
   componentDidMount(){
@@ -84,20 +101,11 @@ class AuctionList extends React.Component {
 
   async handleCategoryChange(e) {
     this.setState({ kategori: e.target.value });
-    this.props.showLoading();
-    const filteredData = await this.props.client.query({
-      query: AUCTIONS_BY_CATEGORY,
-      variables: { categories: e.target.value }
-    });
-    this.props.client.writeQuery({
-      query: ALL_AUCTIONS_QUERY,
-      data: {
-        allAuctions: filteredData.data.getAuctionsByCategory
-      }
-    })
-    this.props.hideLoading();
+    const { search } = this.state;
+    await this.loadAuctionsWithFilter(search,e.target.value);
   }
 
+  /*
   handleDeleteFilter(data) {
     const kategori = [...this.state.kategori];
     const deleteKategori = kategori.findIndex(k => k === data);
@@ -108,22 +116,20 @@ class AuctionList extends React.Component {
       ]
     });
   }
+  */
 
-  async handleSearch(){
-    const { search } = this.state;
-    this.props.showLoading();
-    const searchResults = await this.props.client.query({
-      query: AUCTIONS_BY_TEXT,
-      variables: { search }
-    });
+  async handleSearchChange(e){
+    this.setState({search: e.target.value});
+    const { search, kategori } = this.state;
+    if(kategori.length < 1 && e.target.value.split('').length <= 0){
+      await this.props.auctionsQuery.refetch();
+      return;
+    }
+    await this.loadAuctionsWithFilter(e.target.value,kategori);
+  }
 
-    await this.props.client.writeQuery({
-      query: ALL_AUCTIONS_QUERY,
-      data: {
-        allAuctions: searchResults.data.getAuctionsByText
-      }
-    });
-    this.props.hideLoading();
+  async handleToggleAktif(e,checked){
+    this.setState({berlangsung: checked});
   }
 
   async handleResetFilter(e) {
@@ -159,7 +165,7 @@ class AuctionList extends React.Component {
       <Grid item xs={12}>
         <Grid container direction="column" className={classes.root}>
           <Grid item xs={12} sm={12} md={12} style={{ marginBottom: 16 }}>
-            <Sticky innerZ={100000} top={12}>
+            <Sticky innerZ={10} top={12}>
               <Grid container direction="column" alignItems="center">
                 <div style={{ width: "70%", display: "flex" }}>
                   <FormControl fullWidth>
@@ -167,7 +173,7 @@ class AuctionList extends React.Component {
                       className={classes.textFieldInput}
                       id="amount"
                       value={this.state.search}
-                      onChange={e => this.setState({search: e.target.value})}
+                      onChange={this.handleSearchChange}
                       disableUnderline={true}
                       placeholder="Cari Lelang..."
                     />
@@ -242,7 +248,7 @@ class AuctionList extends React.Component {
                         />
                       ) : null}
                     </div>
-                    <FormControl fullWidth>
+                    <FormControl style={{marginTop: 24}} fullWidth>
                       <InputLabel htmlFor="name-multiple">Kategori</InputLabel>
                       <Select
                         multiple
@@ -273,6 +279,16 @@ class AuctionList extends React.Component {
                         ))}
                       </Select>
                     </FormControl>
+                    <FormControlLabel
+                    style={{alignSelf:"flex-start", marginTop: 24}}
+                      control={
+                        <Switch
+                          checked={this.state.berlangsung}
+                          onChange={this.handleToggleAktif}
+                        />
+                      }
+                      label="Sedang Berlangsung"
+                    />
                   </Grid>
                 </Sticky>
               </Grid>

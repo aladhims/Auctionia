@@ -10,11 +10,11 @@ const AuctionSchema = new Schema({
     type: String,
     required: true
   },
-  photo: {
+  photos: [{
     type: String,
     default:
       "http://www.movehut.co.uk/news/wp-content/uploads/2013/08/Auction-Fever-Hits-London.jpg"
-  },
+  }],
   initialprice: {
     type: Number,
     required: true,
@@ -30,6 +30,11 @@ const AuctionSchema = new Schema({
     required: true
   },
   biddersId: [{ type: Schema.Types.ObjectId }],
+  posted: {
+    type: Date,
+    required: true,
+    default: Date.now,
+  },
   start: {
     type: Date,
     required: true,
@@ -37,8 +42,8 @@ const AuctionSchema = new Schema({
   },
   end: {
     type: Date,
-    default: Date.now,
-    required: true
+    required: true,
+    default: Date.now
   },
   byId: Schema.Types.ObjectId,
   winnerId: Schema.Types.ObjectId,

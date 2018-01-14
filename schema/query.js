@@ -16,15 +16,19 @@ module.exports = {
 
     return auction;
   },
-  getAuctionsByCategory: async (root, { category }, { Auction, user }) => {
-    const auctions = await Auction.find({ category: {$in: category} });
-
-    return auctions;
-  },
-  getAuctionsByText: async (root, { text }, {Auction, user}) => {
-    const auctions = await Auction.find({$text: { $search: text}});
-
-    return auctions;
+  getAuctionsByFilter: async (root, { text, category }, {Auction, user}) => {
+    if(text.split('').length > 0){
+      console.log(text)
+      if(category && category.length > 0){
+        return await Auction.find({$text: { $search: text},category: {$in: category}});
+      }else {
+        return await Auction.find({$text: { $search: text}});
+      }
+    }else {
+      if(category && category.length > 0){
+        return await Auction.find({category: {$in: category}});
+      }
+    }
   },
   currentUser: (root, { id }, { user }) => {
     if (!user) {

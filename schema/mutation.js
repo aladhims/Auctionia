@@ -46,7 +46,7 @@ module.exports = {
   },
   createAuction: async (
     root,
-    { title, description, initialprice, category, start, end, photo },
+    { title, description, initialprice, category, start, end, photos},
     {
       Auction,
       user,
@@ -68,7 +68,7 @@ module.exports = {
       start,
       end,
       byId: user.id,
-      photo
+      photos
     });
     bidsAuction.clearAll();
     auctionByOwnersLoader.clearAll();

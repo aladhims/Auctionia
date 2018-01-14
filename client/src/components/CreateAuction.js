@@ -116,7 +116,7 @@ class CreateAuction extends React.Component {
       activeStep: 0,
       judul: "",
       desc: "",
-      photo: "",
+      photos: [],
       startTime: new Date(),
       endTime: new Date(),
       initialPrice: 0,
@@ -229,6 +229,7 @@ class CreateAuction extends React.Component {
             <input
               type="file"
               name="file"
+              multiple={true}
               id="file"
               onChange={this.handleUpload}
               className={classes.rootUp}
@@ -264,7 +265,7 @@ class CreateAuction extends React.Component {
     const {
       judul,
       desc,
-      photo,
+      photos,
       startTime,
       endTime,
       initialPrice,
@@ -276,7 +277,7 @@ class CreateAuction extends React.Component {
         variables: {
           title: judul,
           description: desc,
-          photo,
+          photos,
           startTime,
           endTime,
           initialprice: parseInt(initialPrice),
@@ -301,28 +302,37 @@ class CreateAuction extends React.Component {
         success: false,
         loading: true
       });
-      const file = e.target.files[0];
-      const ref = Firebase.storage().ref(`lelang/${file.name}`);
-      const task = ref.put(file);
 
-      task.on(
-        "state_changed",
-        () => {},
-        err => {
-          this.setState({
-            loading: false,
-            success: true
-          });
-        },
-        () => {
-          const url = task.snapshot.downloadURL;
-          this.setState({
-            loading: false,
-            success: true,
-            photo: url
-          });
-        }
-      );
+      const files = e.target.files;
+
+      for(var i =0 ; i < files.length; i++){
+        const file = files[i];
+        const ref = Firebase.storage().ref(`lelang/${file.name}`);
+        const task = ref.put(file);
+        
+        task.on(
+          "state_changed",
+          () => {},
+          err => {
+            this.setState({
+              loading: false,
+              success: false,
+            });
+          },
+          () => {
+            const url = task.snapshot.downloadURL;
+            this.setState({
+              photos: [...this.state.photos,url]
+            });
+            if(files.length == this.state.photos.length){
+              this.setState({
+                loading: false,
+                success: true
+              });
+            }
+          }
+        );
+      }
     }
   };
 
