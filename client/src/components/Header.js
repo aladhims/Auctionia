@@ -106,8 +106,6 @@ class Header extends React.Component {
           >
             <div
               className={classes.drawerInner}
-              onMouseOver={this.handleDrawerOpen}
-              onMouseLeave={this.handleDrawerClose}
             >
               <div className={classes.drawerHeader}>
                 <IconButton onClick={this.handleDrawerClose}>

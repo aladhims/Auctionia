@@ -69,6 +69,7 @@ export const styles = theme => ({
     padding: 24,
     paddingLeft: 75,
     height: "calc(100% - 56px)",
+    minHeight: "calc(100vh - 56px)",
     marginTop: 56,
     [theme.breakpoints.up("sm")]: {
       height: "calc(100% - 64px)",

@@ -15,8 +15,9 @@ import green from "material-ui/colors/green";
 import Button from "material-ui/Button";
 import { updateQuery } from "../utils";
 import * as acts from "../actions/index";
+import Moment from 'moment';
 import { connect } from "react-redux";
-
+import { getTimeStatus } from '../utils';
 
 const styles = theme => ({
   root: {
@@ -142,6 +143,8 @@ class BiddingRoom extends Component {
     }
   };
 
+  
+
   render() {
     const { classes, bidsQuery } = this.props;
     if (bidsQuery && bidsQuery.loading) {
@@ -153,10 +156,10 @@ class BiddingRoom extends Component {
     const buttonClassname = classNames({
       [classes.buttonSuccess]: success
     });
-
     const isMine = localStorage.getItem(GQL_USER_ID).toString() === bidsQuery.getAuction.by.id.toString();
-    console.log(localStorage.getItem(GQL_USER_ID),bidsQuery.getAuction.by.id)
     const disabled = isMine || loading;
+    const statusTime = getTimeStatus(bidsQuery.getAuction.start,bidsQuery.getAuction.end);
+    console.log(statusTime)
     return (
       <Grid
         item

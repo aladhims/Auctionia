@@ -17,7 +17,7 @@ import Firebase from "firebase";
 import green from "material-ui/colors/green";
 import CheckIcon from "material-ui-icons/Check";
 import SaveIcon from "material-ui-icons/Save";
-import { CREATE_AUCTION } from "../queries";
+import { CREATE_AUCTION, ALL_AUCTIONS_QUERY, MY_AUCTIONS } from "../queries";
 import { graphql } from "react-apollo";
 
 const categories = [
@@ -281,9 +281,14 @@ class CreateAuction extends React.Component {
           endTime,
           initialprice: parseInt(initialPrice),
           category: kategori
-        }
+        },
+        refetchQueries: [{
+          query: ALL_AUCTIONS_QUERY
+        },{
+          query: MY_AUCTIONS
+        }]
       });
-      console.log(result);
+
       this.props.history.push("/app/myauction");
     } catch (err) {
       console.log(err);

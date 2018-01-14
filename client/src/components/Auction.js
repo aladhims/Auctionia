@@ -17,6 +17,8 @@ import Button from "material-ui/Button";
 import Moment from "moment";
 import { Link } from "react-router-dom";
 import { toRp } from "../utils";
+import BookmarkBorder from "material-ui-icons/BookmarkBorder";
+import IconButton from 'material-ui/IconButton';
 
 const styles = theme => ({
   card: {
@@ -109,7 +111,7 @@ class RecipeReviewCard extends React.Component {
             {auction.title}
           </Typography>
           <Typography gutterBottom={true} className={classes.pos}>
-            Harga tertinggi terakhir :{" "}
+            Harga Awal :{" "}
             <em>
               <b>{toRp(auction.currentprice)}</b>
             </em>
@@ -117,12 +119,16 @@ class RecipeReviewCard extends React.Component {
           <Typography component="p">{auction.description}</Typography>
         </CardContent>
         <CardActions disableActionSpacing>
+          <IconButton>
+            <BookmarkBorder/>
+          </IconButton>
+          <Typography type="caption">{auction.category}</Typography>
+          <div className={classes.flexGrow} />
           <Link to={`/app/auction/${auction.id}`} params={auction}>
             <Button dense color="primary">
               Lihat
             </Button>
           </Link>
-          <div className={classes.flexGrow} />
         </CardActions>
       </Card>
     );

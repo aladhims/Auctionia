@@ -56,4 +56,6 @@ AuctionSchema.pre("save", function(next) {
   next();
 });
 
+AuctionSchema.index({title: 'text', description: 'text'});
+
 module.exports = mongoose.model("Auction", AuctionSchema);

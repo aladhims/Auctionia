@@ -1,3 +1,5 @@
+import Moment from "moment";
+
 export function toRp(angka) {
   var rev = parseInt(angka, 10)
     .toString()
@@ -96,5 +98,16 @@ export const updateQuery = (previous, { subscriptionData }) => {
     };
 
     return result;
+  }
+};
+
+export const getTimeStatus = (start,end) => {
+
+  if(Moment(Date.now()).isBefore(start)){
+    return "NOT STARTED";
+  }else if(Moment(Date.now()).isBetween(start,end)){
+    return "ON PROGRESS";
+  }else if(Moment(Date.now()).isAfter(end)){
+    return "FINISHED";
   }
 };

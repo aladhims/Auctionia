@@ -21,6 +21,11 @@ module.exports = {
 
     return auctions;
   },
+  getAuctionsByText: async (root, { text }, {Auction, user}) => {
+    const auctions = await Auction.find({$text: { $search: text}});
+
+    return auctions;
+  },
   currentUser: (root, { id }, { user }) => {
     if (!user) {
       throw new Error("Unauthorized");
@@ -34,5 +39,5 @@ module.exports = {
 
     const theBids = await Bid.find({ auctionId });
     return theBids;
-  }
+  },
 };

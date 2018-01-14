@@ -87,6 +87,7 @@ const schema = `
         Emas
         Kerajinan
         Property
+        Elektronik
     }
 
     type Query {
@@ -96,6 +97,7 @@ const schema = `
         getUser(id: ID!): User
         getAuction(id: ID!): Auction
         getAuctionsByCategory(category: [categor!]!): [Auction!]
+        getAuctionsByText(text: String!): [Auction!]
         currentUser: User
         getBids(auctionId: ID!): [Bid!]
     }

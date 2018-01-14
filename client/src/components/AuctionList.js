@@ -18,8 +18,8 @@ import Button from "material-ui/Button";
 import Icon from "material-ui/Icon";
 import * as acts from "../actions/index";
 import { connect } from "react-redux";
-import { ALL_AUCTIONS_QUERY, AUCTIONS_BY_CATEGORY } from "../queries";
-import Chip from 'material-ui/Chip';
+import { ALL_AUCTIONS_QUERY, AUCTIONS_BY_CATEGORY, AUCTIONS_BY_TEXT } from "../queries";
+import Chip from "material-ui/Chip";
 import Sticky from "react-stickynode";
 
 const styles = theme => ({
@@ -68,40 +68,78 @@ class AuctionList extends React.Component {
     super(props);
 
     this.state = {
-      kategori: ["Pakaian",
-      "Kendaraan",
-      "Emas",]
+      kategori: [],
+      search: "",
     };
 
     this.handleCategoryChange = this.handleCategoryChange.bind(this);
     this.handleDeleteFilter = this.handleDeleteFilter.bind(this);
+    this.handleResetFilter = this.handleResetFilter.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
+  }
+
+  componentDidMount(){
+    this.props.auctionsQuery.refetch();
   }
 
   async handleCategoryChange(e) {
     this.setState({ kategori: e.target.value });
+    this.props.showLoading();
     const filteredData = await this.props.client.query({
       query: AUCTIONS_BY_CATEGORY,
-      variables: { categories: this.state.kategori},
+      variables: { categories: e.target.value }
     });
-
-    console.log(filteredData);
+    this.props.client.writeQuery({
+      query: ALL_AUCTIONS_QUERY,
+      data: {
+        allAuctions: filteredData.data.getAuctionsByCategory
+      }
+    })
+    this.props.hideLoading();
   }
 
   handleDeleteFilter(data) {
     const kategori = [...this.state.kategori];
     const deleteKategori = kategori.findIndex(k => k === data);
-    this.setState({ kategori: [
-      ...kategori.slice(0,deleteKategori),
-      ...kategori.slice(deleteKategori + 1)
-    ] });
+    this.setState({
+      kategori: [
+        ...kategori.slice(0, deleteKategori),
+        ...kategori.slice(deleteKategori + 1)
+      ]
+    });
+  }
+
+  async handleSearch(){
+    const { search } = this.state;
+    this.props.showLoading();
+    const searchResults = await this.props.client.query({
+      query: AUCTIONS_BY_TEXT,
+      variables: { search }
+    });
+
+    await this.props.client.writeQuery({
+      query: ALL_AUCTIONS_QUERY,
+      data: {
+        allAuctions: searchResults.data.getAuctionsByText
+      }
+    });
+    this.props.hideLoading();
+  }
+
+  async handleResetFilter(e) {
+    this.setState({ kategori: [] });
+    this.props.showLoading();
+    await this.props.auctionsQuery.refetch();
+    this.props.hideLoading();
   }
   render() {
     const { classes, theme } = this.props;
     const categories = [
       "Pakaian",
       "Kendaraan",
+      "Antik",
       "Emas",
-      "Barang Antik",
+      "Kerajinan",
       "Property",
       "Elektronik"
     ];
@@ -128,11 +166,13 @@ class AuctionList extends React.Component {
                     <Input
                       className={classes.textFieldInput}
                       id="amount"
+                      value={this.state.search}
+                      onChange={e => this.setState({search: e.target.value})}
                       disableUnderline={true}
                       placeholder="Cari Lelang..."
                     />
                   </FormControl>
-                  <Button raised color="accent">
+                  <Button raised color="accent" onClick={this.handleSearch}>
                     <Search />
                   </Button>
                 </div>
@@ -142,7 +182,13 @@ class AuctionList extends React.Component {
           <Divider style={{ height: 3 }} />
           <Grid item xs={12} sm={12} md={12}>
             <Grid container direction="row">
-              <Grid item xs={12} sm={8} md={8} style={{ marginTop: 16, borderRight: "solid 3px #e0e0e0" }}>
+              <Grid
+                item
+                xs={12}
+                sm={8}
+                md={8}
+                style={{ marginTop: 16, borderRight: "solid 3px #e0e0e0" }}
+              >
                 <Grid
                   container
                   className={classes.root}
@@ -167,17 +213,34 @@ class AuctionList extends React.Component {
               </Grid>
               <Grid item xs={12} sm={4} md={4} style={{ marginTop: 16 }}>
                 <Sticky top={80}>
-                  <Grid container direction="column" alignItems="center" alignContent="space-between" spacing={24} style={{padding: 16}}>
-                    <div style={{ maxWidth: "100%",display: "flex",direction: "row"}}>
-                      {this.state.kategori.map((cat,index) => {
+                  <Grid
+                    container
+                    direction="column"
+                    alignItems="center"
+                    alignContent="space-between"
+                    spacing={24}
+                    style={{ padding: 16 }}
+                  >
+                    <div
+                      style={{
+                        maxWidth: "100%",
+                        display: "flex",
+                        direction: "row"
+                      }}
+                    >
+                      {this.state.kategori.map((cat, index) => {
                         return (
-                          <Chip
-                            style={{margin: 4 }}
-                            label={cat}
-                            key={index}
-                          />
+                          <Chip style={{ margin: 8,backgroundColor: "#40C4FF", color: "white" }} label={cat} key={index} />
                         );
                       })}
+                      {this.state.kategori.length > 0 ? (
+                        <Chip
+                          style={{ margin: 8 }}
+                          label="hapus filter"
+                          onDelete={this.handleResetFilter}
+                          key={22}
+                        />
+                      ) : null}
                     </div>
                     <FormControl fullWidth>
                       <InputLabel htmlFor="name-multiple">Kategori</InputLabel>
@@ -227,5 +290,7 @@ AuctionList.propTypes = {
 
 const theComponent = withStyles(styles, { withTheme: true })(AuctionList);
 export default connect(null, acts)(
-  withApollo(graphql(ALL_AUCTIONS_QUERY, { name: "auctionsQuery" })(theComponent))
+  withApollo(
+    graphql(ALL_AUCTIONS_QUERY, { name: "auctionsQuery" })(theComponent)
+  )
 );

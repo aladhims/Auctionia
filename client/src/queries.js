@@ -63,6 +63,7 @@ query getAuctionsDetail($id: ID!) {
         start
         end
         status
+        category
         by {
             id
             name
@@ -182,6 +183,26 @@ export const CREATE_AUCTION = gql`
                 photo
             }
         }
+    }
+`;
+
+export const AUCTIONS_BY_TEXT = gql`
+    query AuctionsText($search: String!) {
+      getAuctionsByText(text: $search){
+        id
+        title
+        description
+        currentprice
+        photo
+        start
+        category
+        end
+        status
+        by {
+          name
+          photo
+        }
+      }
     }
 `
 
