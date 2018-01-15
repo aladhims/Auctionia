@@ -18,6 +18,7 @@ import * as acts from "../actions/index";
 import Moment from 'moment';
 import { connect } from "react-redux";
 import { getTimeStatus } from '../utils';
+import Typography from "material-ui/Typography";
 
 const styles = theme => ({
   root: {
@@ -101,7 +102,6 @@ class BiddingRoom extends Component {
           const { myBid } = this.state;
           const amount = parseInt(myBid);
           if (checkMyId === -1) {
-            console.log("TEST CREATED");
             await this.props.bidsCreate({
               variables: {
                 amount,
@@ -109,7 +109,6 @@ class BiddingRoom extends Component {
               }
             });
           } else {
-            console.log("UPDATED");
             const myBid = bidders.find(function(b) {
               return b.byId === myId;
             });
@@ -143,7 +142,17 @@ class BiddingRoom extends Component {
     }
   };
 
-  
+  approximateAuction(status,end,start){
+    console.log(status)
+    switch(status){
+      case "FINISHED":
+        return null;
+      case "ON PROGRESS":
+        return <Typography type="headline" style={{marginBottom: 16}} component="h1">Lelang Berakhir {Moment(end).fromNow()}</Typography>;
+      case "NOT STARTED":
+        return <Typography type="headline" style={{marginBottom: 16}} component="h1">Lelang dimulai {Moment(start).fromNow()}</Typography>;
+    }
+  }
 
   render() {
     const { classes, bidsQuery } = this.props;
@@ -157,14 +166,13 @@ class BiddingRoom extends Component {
       [classes.buttonSuccess]: success
     });
     const isMine = localStorage.getItem(GQL_USER_ID).toString() === bidsQuery.getAuction.by.id.toString();
-    const disabled = isMine || loading;
     const statusTime = getTimeStatus(bidsQuery.getAuction.start,bidsQuery.getAuction.end);
-    console.log(statusTime)
+    const disabled =  statusTime == "FINISHED" || isMine || loading;
     return (
       <Grid
         item
         xs={12}
-        style={{ marginTop: 24, height: "calc(100vh - 130px)" }}
+        style={{ marginTop: 24, height: "calc(100vh - 130px)",padding: 24 }}
       >
         <Grid container alignItems="center" direction="row">
           <Grid item xs={12} sm={12} md={6} lg={6}>
@@ -174,13 +182,14 @@ class BiddingRoom extends Component {
               alignItems="center"
               direction="column"
             >
+              {this.approximateAuction(statusTime,bidsQuery.getAuction.end,bidsQuery.getAuction.start)}
               <Auction auction={bidsQuery.getAuction} />
             </Grid>
           </Grid>
           <Grid item xs={12} sm={12} md={4} lg={4}>
             <Grid container justify="center" alignItems="stretch">
               <BidList theBids={bidsQuery.getAuction.bidders} />
-              {isMine ? null : (
+              {disabled ? null : (
                 <Grid container direction="row" justify="center" spacing={24}>
                   <FormControl
                     margin="normal"
@@ -210,7 +219,7 @@ class BiddingRoom extends Component {
                         raised
                         color="primary"
                         className={buttonClassname}
-                        disabled={loading}
+                        disabled={disabled}
                         onClick={this.handleUpdateBid}
                       >
                         {this.state.perbaruiText}

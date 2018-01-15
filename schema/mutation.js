@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const pubsub = require("../utils/pubsub");
 const config = require("../config/config");
+const CronJob = require('cron').CronJob;
 
 module.exports = {
   createUser: async (
@@ -49,6 +50,7 @@ module.exports = {
     { title, description, initialprice, category, start, end, photos},
     {
       Auction,
+      Bid,
       user,
       loaders: {
         bidsAuction,
@@ -73,7 +75,19 @@ module.exports = {
     bidsAuction.clearAll();
     auctionByOwnersLoader.clearAll();
     auctionByParticipantsLoader.clearAll();
-    return await auction.save();
+    const savedAuction = await auction.save();
+    var job = new CronJob(new Date(end), async function() {
+      const bids = await Bid.find({ auctionId: savedAuction._id }).sort("-amount");
+      
+      const winnerBid = bids[0];
+      await Auction.findByIdAndUpdate(savedAuction._id,{winnerId:winnerBid.byId, status: "COMPLETED"});
+
+      }, function () {
+      },
+      true, /* Start the job right now */
+      "Asia/Jakarta" /* Time zone of this job. */
+    );
+    return savedAuction;
   },
   putBid: async (
     root,

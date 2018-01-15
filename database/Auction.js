@@ -26,7 +26,7 @@ const AuctionSchema = new Schema({
   },
   category: {
     type: String,
-    enum: ["Pakaian", "Kendaraan", "Emas", "Antik", "Kerajinan"],
+    enum: ["Pakaian", "Kendaraan", "Emas", "Antik", "Kerajinan","Properti","Elektronik"],
     required: true
   },
   biddersId: [{ type: Schema.Types.ObjectId }],
@@ -61,6 +61,6 @@ AuctionSchema.pre("save", function(next) {
   next();
 });
 
-AuctionSchema.index({title: 'text', description: 'text'});
+AuctionSchema.index({title: 'text', description: 'text'},{weights:{title: 5, description: 2}});
 
 module.exports = mongoose.model("Auction", AuctionSchema);

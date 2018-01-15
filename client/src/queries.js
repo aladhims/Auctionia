@@ -62,6 +62,7 @@ query getAuctionsDetail($id: ID!) {
         photos
         start
         end
+        posted
         status
         category
         by {
@@ -110,7 +111,7 @@ export const MY_AUCTIONS = gql`
             auctions {
               id
               title
-              start
+              posted
               photos
               status
             }
@@ -118,7 +119,7 @@ export const MY_AUCTIONS = gql`
             participations {
               id
               title
-              start
+              posted
               photos
               status
             }
@@ -135,6 +136,13 @@ export const ALL_AUCTIONS_QUERY = gql`
       currentprice
       photos
       start
+      posted
+      winner {
+        name
+      }
+      bidders {
+        amount
+      }
       category
       end
       status
@@ -155,9 +163,13 @@ export const CREATE_AUCTION = gql`
             currentprice
             photos
             start
+            posted
             category
             end
             status
+            bidders {
+                amount
+            }
             by {
                 name
                 photo
@@ -175,9 +187,16 @@ export const AUCTIONS_BY_FILTER = gql`
         currentprice
         photos
         start
+        posted
         category
         end
         status
+        winner {
+          name
+        }
+        bidders {
+          amount
+        }
         by {
           name
           photo

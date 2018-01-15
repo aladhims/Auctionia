@@ -5,7 +5,7 @@ import Grid from "material-ui/Grid";
 import Paper from "material-ui/Paper";
 import Auction from "./Auction";
 import Search from "material-ui-icons/Search";
-import Input, { InputLabel } from "material-ui/Input";
+import Input, { InputLabel, InputAdornment } from "material-ui/Input";
 import { FormControl } from "material-ui/Form";
 import IconButton from "material-ui/IconButton";
 import Select from "material-ui/Select";
@@ -21,8 +21,8 @@ import { connect } from "react-redux";
 import { ALL_AUCTIONS_QUERY, AUCTIONS_BY_FILTER } from "../queries";
 import Chip from "material-ui/Chip";
 import Sticky from "react-stickynode";
-import { FormControlLabel, FormGroup } from 'material-ui/Form';
-import Switch from 'material-ui/Switch';
+import { FormControlLabel, FormGroup } from "material-ui/Form";
+import Switch from "material-ui/Switch";
 
 const styles = theme => ({
   root: {
@@ -46,9 +46,10 @@ const styles = theme => ({
     borderRadius: 4,
     background: theme.palette.common.white,
     border: "1px solid #ced4da",
-    height: "80%",
+    height: "60%",
     fontSize: 14,
-    padding: 12,
+    paddingLeft: 8,
+    paddingBottom: 6,
     width: "calc(100% - 24px)",
     transition: theme.transitions.create(["border-color", "box-shadow"]),
     "&:focus": {
@@ -72,37 +73,42 @@ class AuctionList extends React.Component {
     this.state = {
       kategori: [],
       search: "",
-      berlangsung: false,
+      berlangsung: false
     };
 
     this.handleCategoryChange = this.handleCategoryChange.bind(this);
     this.handleResetFilter = this.handleResetFilter.bind(this);
     this.handleSearchChange = this.handleSearchChange.bind(this);
+    this.handleToggleAktif = this.handleToggleAktif.bind(this);
   }
 
-  async loadAuctionsWithFilter(search,categories) {
+  async loadAuctionsWithFilter(search, categories) {
     this.props.showLoading();
     const filteredData = await this.props.client.query({
       query: AUCTIONS_BY_FILTER,
-      variables: {  search,categories }
+      variables: { search, categories }
     });
     this.props.client.writeQuery({
       query: ALL_AUCTIONS_QUERY,
       data: {
         allAuctions: filteredData.data.getAuctionsByFilter
       }
-    })
+    });
     this.props.hideLoading();
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.props.auctionsQuery.refetch();
   }
 
   async handleCategoryChange(e) {
     this.setState({ kategori: e.target.value });
     const { search } = this.state;
-    await this.loadAuctionsWithFilter(search,e.target.value);
+    if (e.target.value.length > 0) {
+      await this.loadAuctionsWithFilter(search, e.target.value);
+    } else {
+      this.props.auctionsQuery.refetch();
+    }
   }
 
   /*
@@ -118,18 +124,18 @@ class AuctionList extends React.Component {
   }
   */
 
-  async handleSearchChange(e){
-    this.setState({search: e.target.value});
+  async handleSearchChange(e) {
+    this.setState({ search: e.target.value });
     const { search, kategori } = this.state;
-    if(kategori.length < 1 && e.target.value.split('').length <= 0){
+    if (kategori.length < 1 && e.target.value.split("").length <= 0) {
       await this.props.auctionsQuery.refetch();
       return;
     }
-    await this.loadAuctionsWithFilter(e.target.value,kategori);
+    await this.loadAuctionsWithFilter(e.target.value, kategori);
   }
 
-  async handleToggleAktif(e,checked){
-    this.setState({berlangsung: checked});
+  handleToggleAktif(e, checked) {
+    this.setState({ berlangsung: checked });
   }
 
   async handleResetFilter(e) {
@@ -162,28 +168,40 @@ class AuctionList extends React.Component {
     this.props.hideLoading();
     const auctions = this.props.auctionsQuery.allAuctions;
     return (
-      <Grid item xs={12}>
+      <Grid item xs={12} style={{padding: 24}}>
         <Grid container direction="column" className={classes.root}>
           <Grid item xs={12} sm={12} md={12} style={{ marginBottom: 16 }}>
-            <Sticky innerZ={10} top={12}>
-              <Grid container direction="column" alignItems="center">
-                <div style={{ width: "70%", display: "flex" }}>
-                  <FormControl fullWidth>
-                    <Input
-                      className={classes.textFieldInput}
-                      id="amount"
-                      value={this.state.search}
-                      onChange={this.handleSearchChange}
-                      disableUnderline={true}
-                      placeholder="Cari Lelang..."
+            <Grid container direction="column" alignItems="center">
+              <div
+                style={{
+                  maxWidth: "100%",
+                  display: "flex",
+                  direction: "row"
+                }}
+              >
+                {this.state.kategori.map((cat, index) => {
+                  return (
+                    <Chip
+                      style={{
+                        margin: 8,
+                        backgroundColor: "#40C4FF",
+                        color: "white"
+                      }}
+                      label={cat}
+                      key={index}
                     />
-                  </FormControl>
-                  <Button raised color="accent" onClick={this.handleSearch}>
-                    <Search />
-                  </Button>
-                </div>
-              </Grid>
-            </Sticky>
+                  );
+                })}
+                {this.state.kategori.length > 0 ? (
+                  <Chip
+                    style={{ margin: 8 }}
+                    label="hapus filter"
+                    onDelete={this.handleResetFilter}
+                    key={22}
+                  />
+                ) : null}
+              </div>
+            </Grid>
           </Grid>
           <Divider style={{ height: 3 }} />
           <Grid item xs={12} sm={12} md={12}>
@@ -227,28 +245,24 @@ class AuctionList extends React.Component {
                     spacing={24}
                     style={{ padding: 16 }}
                   >
-                    <div
-                      style={{
-                        maxWidth: "100%",
-                        display: "flex",
-                        direction: "row"
-                      }}
-                    >
-                      {this.state.kategori.map((cat, index) => {
-                        return (
-                          <Chip style={{ margin: 8,backgroundColor: "#40C4FF", color: "white" }} label={cat} key={index} />
-                        );
-                      })}
-                      {this.state.kategori.length > 0 ? (
-                        <Chip
-                          style={{ margin: 8 }}
-                          label="hapus filter"
-                          onDelete={this.handleResetFilter}
-                          key={22}
-                        />
-                      ) : null}
-                    </div>
-                    <FormControl style={{marginTop: 24}} fullWidth>
+                    <FormControl fullWidth>
+                      <Input
+                        className={classes.textFieldInput}
+                        id="amount"
+                        value={this.state.search}
+                        onChange={this.handleSearchChange}
+                        disableUnderline={true}
+                        placeholder="Cari Lelang..."
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton>
+                              <Search/>
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                      />
+                    </FormControl>
+                    <FormControl style={{ marginTop: 24 }} fullWidth>
                       <InputLabel htmlFor="name-multiple">Kategori</InputLabel>
                       <Select
                         multiple
@@ -280,14 +294,14 @@ class AuctionList extends React.Component {
                       </Select>
                     </FormControl>
                     <FormControlLabel
-                    style={{alignSelf:"flex-start", marginTop: 24}}
+                      style={{ alignSelf: "flex-start", marginTop: 24 }}
                       control={
                         <Switch
                           checked={this.state.berlangsung}
                           onChange={this.handleToggleAktif}
                         />
                       }
-                      label="Sedang Berlangsung"
+                      label="dalam proses"
                     />
                   </Grid>
                 </Sticky>

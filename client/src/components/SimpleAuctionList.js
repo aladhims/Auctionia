@@ -30,13 +30,18 @@ const SimpleAuction = myAuction => {
   return (
     <Link to={`/app/auction/${myAuction.myAuction.id}`}>
       <ListItem divider={true}>
-        <Avatar src={myAuction.myAuction.photo} alt={myAuction.myAuction.title} />
+        <Avatar
+          src={myAuction.myAuction.photos[0]}
+          alt={myAuction.myAuction.title}
+        />
         <ListItemText
           primary={myAuction.myAuction.title}
-          secondary={Moment(myAuction.myAuction.start).fromNow()}
+          secondary={Moment(myAuction.myAuction.posted).fromNow()}
         />
         <ListItemSecondaryAction style={{ padding: 8 }}>
-          <Typography type="subheading">{myAuction.myAuction.status}</Typography>
+          <Typography type="subheading">
+            {myAuction.myAuction.status}
+          </Typography>
         </ListItemSecondaryAction>
       </ListItem>
     </Link>

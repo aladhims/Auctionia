@@ -16,17 +16,23 @@ module.exports = {
 
     return auction;
   },
-  getAuctionsByFilter: async (root, { text, category }, {Auction, user}) => {
-    if(text.split('').length > 0){
-      console.log(text)
-      if(category && category.length > 0){
-        return await Auction.find({$text: { $search: text},category: {$in: category}});
-      }else {
-        return await Auction.find({$text: { $search: text}});
+  getAuctionsByFilter: async (root, { text, category }, { Auction, user }) => {
+    if (text.split("").length > 0) {
+      console.log(text);
+      if (category && category.length > 0) {
+        return await Auction.find(
+          { $text: { $search: text }, category: { $in: category } },
+          { score: { $meta: "textScore" } }
+        ).sort({ score: { $meta: "textScore" } });
+      } else {
+        return await Auction.find(
+          { $text: { $search: text } },
+          { score: { $meta: "textScore" } }
+        ).sort({ score: { $meta: "textScore" } });
       }
-    }else {
-      if(category && category.length > 0){
-        return await Auction.find({category: {$in: category}});
+    } else {
+      if (category && category.length > 0) {
+        return await Auction.find({ category: { $in: category } });
       }
     }
   },
@@ -43,5 +49,5 @@ module.exports = {
 
     const theBids = await Bid.find({ auctionId });
     return theBids;
-  },
+  }
 };

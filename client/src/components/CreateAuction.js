@@ -34,7 +34,8 @@ const styles = theme => ({
   root: {
     width: "90%",
     margin: "0 auto",
-    height: "90vh"
+    height: "80vh",
+    padding: 24
   },
   formElements: {
     width: "50%"

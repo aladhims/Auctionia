@@ -35,7 +35,7 @@ const loaders = ({ User, Auction, Transaction, Bid }) => ({
   ),
   userAuctionWinner: new DataLoader(
     keys =>
-      Promise.all(keys.map(async key => await User.findOne({ winnerId: key }))),
+      Promise.all(keys.map(async key => await User.findById(key))),
     { cacheKeyFn: key => key.toString() }
   ),
   userTransactionID: new DataLoader(
@@ -57,7 +57,6 @@ const loaders = ({ User, Auction, Transaction, Bid }) => ({
           async key =>
             await Bid.find({ auctionId: key })
               .sort("-amount")
-              .limit(10)
         )
       ),
     { cacheKeyFn: key => key.toString() }

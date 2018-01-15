@@ -14,7 +14,6 @@ export const styles = theme => ({
   content: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
-    padding: 24,
     height: "100%",
     minHeight: "100vh",
     marginTop: 56,

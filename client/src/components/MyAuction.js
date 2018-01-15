@@ -38,7 +38,7 @@ class MyAuction extends React.Component {
     const { auctions, participations } = myAuctions.currentUser;
 
     return (
-      <div>
+      <div style={{paddingTop: 24}}>
         <div style={{ width: "80%", margin: "32px auto" }}>
           <Paper>
             <Tabs

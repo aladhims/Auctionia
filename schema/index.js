@@ -87,7 +87,7 @@ const schema = `
         Antik
         Emas
         Kerajinan
-        Property
+        Properti
         Elektronik
     }
 
